@@ -1,0 +1,66 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+
+import { JwtService } from '@nestjs/jwt';
+
+import * as bcrypt from 'bcrypt';
+
+import { PrismaService } from '../prisma/prisma.service.js';
+
+import { LoginDto } from './dto/login.dto.js';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async login(dto: LoginDto) {
+    const usuario = await this.prisma.usuario.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+
+    if (!usuario) {
+      throw new UnauthorizedException(
+        'Usuário ou senha inválidos',
+      );
+    }
+
+    const senhaValida = await bcrypt.compare(
+      dto.password,
+      usuario.senhaHash,
+    );
+
+    if (!senhaValida) {
+      throw new UnauthorizedException(
+        'Usuário ou senha inválidos',
+      );
+    }
+
+    const token = await this.jwtService.signAsync({
+      sub: usuario.id,
+      email: usuario.email,
+    });
+
+    return {
+      access_token: token,
+    };
+  }
+
+  async me(userId: string) {
+    return this.prisma.usuario.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        perfis: {
+          include: {
+            perfil: true,
+          },
+        },
+      },
+    });
+  }
+}
