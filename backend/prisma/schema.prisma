@@ -33,6 +33,8 @@ model Empresa {
   usuarios      Usuario[]
   clientes      Cliente[]
 
+  produtos      Produto[]
+
   configuracao  ConfiguracaoEmpresa?
 
   @@map("empresas")
@@ -191,4 +193,44 @@ model LocalAplicacao {
   nome        String   @unique
 
   @@map("locais_aplicacao")
+}
+
+model Produto {
+  id            String   @id @default(uuid())
+
+  empresaId     String
+  empresa       Empresa  @relation(fields: [empresaId], references: [id])
+
+  nome          String
+
+  descricao     String?
+
+  ativo         Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  precos        TabelaPreco[]
+
+  @@map("produtos")
+}
+
+model TabelaPreco {
+  id                String   @id @default(uuid())
+
+  produtoId         String
+
+  produto           Produto
+      @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  quantidadeMin     Int
+
+  quantidadeMax     Int
+
+  precoUnitario     Decimal @db.Decimal(10,2)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("tabela_precos")
 }
