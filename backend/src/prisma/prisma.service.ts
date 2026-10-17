@@ -30,6 +30,6 @@ export class PrismaService
   implements OnModuleInit
 {
   async onModuleInit() {
-    this.$connect();
+    await this.$connect();
   }
 }

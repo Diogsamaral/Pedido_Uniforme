@@ -6,6 +6,8 @@ import { UsuariosModule } from './usuarios/usuarios.module.js';
 import { ClientesModule } from './clientes/clientes.module.js';
 import { ContatosClienteModule } from './contatos-cliente/contatos-cliente.module.js';
 import { ProdutosModule } from './produtos/produtos.module.js';
+import { TabelaPrecosModule } from './tabela-precos/tabela-precos.module.js';
+import { OrcamentosModule } from './orcamentos/orcamentos.module.js';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { ProdutosModule } from './produtos/produtos.module.js';
     ClientesModule,
     ContatosClienteModule,
     ProdutosModule,
+    TabelaPrecosModule,
+    OrcamentosModule,
   ],
 })
 export class AppModule {}

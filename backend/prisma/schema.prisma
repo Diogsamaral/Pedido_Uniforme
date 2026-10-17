@@ -14,223 +14,282 @@ enum PerfilCodigo {
   FINANCEIRO
 }
 
+enum OrcamentoStatus {
+  RASCUNHO
+  ENVIADO
+  APROVADO
+  REPROVADO
+}
+
 model Empresa {
-  id            String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  nome          String
-  nomeFantasia  String?
+  nome         String
+  nomeFantasia String?
 
-  cnpj          String?  @unique
+  cnpj String? @unique
 
-  email         String?
+  email String?
 
-  cidade        String?
-  estado        String?
+  cidade String?
+  estado String?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  usuarios      Usuario[]
-  clientes      Cliente[]
+  usuarios Usuario[]
+  clientes Cliente[]
 
-  produtos      Produto[]
+  produtos Produto[]
 
-  configuracao  ConfiguracaoEmpresa?
+  orcamentos Orcamento[]
+
+  configuracao ConfiguracaoEmpresa?
 
   @@map("empresas")
 }
 
 model ConfiguracaoEmpresa {
-  id                     String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  empresaId              String   @unique
+  empresaId String @unique
 
-  empresa                Empresa  @relation(fields: [empresaId], references: [id])
+  empresa Empresa @relation(fields: [empresaId], references: [id])
 
-  quantidadeMinimaPedido Int      @default(20)
+  quantidadeMinimaPedido Int @default(20)
 
-  valorAplicacao         Decimal  @db.Decimal(12,2)
+  valorAplicacao Decimal @db.Decimal(12, 2)
 
-  descontoPix            Decimal  @db.Decimal(5,2)
+  descontoPix Decimal @db.Decimal(5, 2)
 
-  acrescimoCartao        Decimal  @db.Decimal(5,2)
+  acrescimoCartao Decimal @db.Decimal(5, 2)
 
-  prazoEntregaDiasMin    Int
-  prazoEntregaDiasMax    Int
+  prazoEntregaDiasMin Int
+  prazoEntregaDiasMax Int
 
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("configuracoes_empresa")
 }
 
 model Perfil {
-  id          Int           @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  codigo      PerfilCodigo  @unique
+  codigo PerfilCodigo @unique
 
-  descricao   String?
+  descricao String?
 
-  createdAt   DateTime      @default(now())
+  createdAt DateTime @default(now())
 
-  usuarios    UsuarioPerfil[]
+  usuarios UsuarioPerfil[]
 
   @@map("perfis")
 }
 
 model Usuario {
-  id            String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  empresaId     String
+  empresaId String
 
-  empresa       Empresa  @relation(fields: [empresaId], references: [id])
+  empresa Empresa @relation(fields: [empresaId], references: [id])
 
-  nome          String
+  nome String
 
-  email         String   @unique
+  email String @unique
 
-  senhaHash     String
+  senhaHash String
 
-  ativo         Boolean  @default(true)
+  ativo Boolean @default(true)
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  perfis        UsuarioPerfil[]
+  perfis UsuarioPerfil[]
 
   @@map("usuarios")
 }
 
 model UsuarioPerfil {
-  usuarioId     String
+  usuarioId String
 
-  perfilId      Int
+  perfilId Int
 
-  usuario       Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
-  perfil        Perfil  @relation(fields: [perfilId], references: [id], onDelete: Cascade)
+  perfil Perfil @relation(fields: [perfilId], references: [id], onDelete: Cascade)
 
-  atribuidoEm   DateTime @default(now())
+  atribuidoEm DateTime @default(now())
 
   @@id([usuarioId, perfilId])
-
   @@map("usuarios_perfis")
 }
 
 model Cliente {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  empresaId         String
+  empresaId String
 
-  empresa           Empresa  @relation(fields: [empresaId], references: [id])
+  empresa Empresa @relation(fields: [empresaId], references: [id])
 
-  razaoSocial       String
+  razaoSocial String
 
-  nomeFantasia      String?
+  nomeFantasia String?
 
-  cnpj              String   @unique
+  cnpj String @unique
 
-  email             String?
+  email String?
 
-  telefone          String?
+  telefone String?
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  orcamentos Orcamento[]
 
-  contatos          ContatoCliente[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contatos ContatoCliente[]
 
   @@map("clientes")
 }
 
 model ContatoCliente {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  clienteId         String
+  clienteId String
 
-  cliente           Cliente @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  cliente Cliente @relation(fields: [clienteId], references: [id], onDelete: Cascade)
 
-  nome              String
+  nome String
 
-  cargo             String?
+  cargo String?
 
-  email             String?
+  email String?
 
-  telefone          String?
+  telefone String?
 
-  principal         Boolean  @default(false)
+  principal Boolean @default(false)
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("contatos_cliente")
 }
 
 model FormaPagamento {
-  id                     Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  descricao              String   @unique
+  descricao String @unique
 
-  descontoPercentual     Decimal  @default(0) @db.Decimal(5,2)
+  descontoPercentual Decimal @default(0) @db.Decimal(5, 2)
 
-  acrescimoPercentual    Decimal  @default(0) @db.Decimal(5,2)
+  acrescimoPercentual Decimal @default(0) @db.Decimal(5, 2)
 
-  ativo                  Boolean  @default(true)
+  ativo Boolean @default(true)
 
   @@map("formas_pagamento")
 }
 
 model TipoAplicacao {
-  id          Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  nome        String   @unique
+  nome String @unique
 
   @@map("tipos_aplicacao")
 }
 
 model LocalAplicacao {
-  id          Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  nome        String   @unique
+  nome String @unique
 
   @@map("locais_aplicacao")
 }
 
 model Produto {
-  id            String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  empresaId     String
-  empresa       Empresa  @relation(fields: [empresaId], references: [id])
+  empresaId String
 
-  nome          String
+  empresa Empresa @relation(fields: [empresaId], references: [id])
 
-  descricao     String?
+  nome String
 
-  ativo         Boolean  @default(true)
+  descricao String?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  ativo Boolean @default(true)
 
-  precos        TabelaPreco[]
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  precos TabelaPreco[]
+
+  orcamentoItens OrcamentoItem[]
 
   @@map("produtos")
 }
 
 model TabelaPreco {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
+
+  produtoId String
+
+  produto Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  quantidadeMin Int
+
+  quantidadeMax Int
+
+  precoUnitario Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@map("tabela_precos")
+}
+
+model Orcamento {
+  id              String   @id @default(uuid())
+
+  empresaId       String
+  empresa         Empresa @relation(fields: [empresaId], references: [id])
+
+  clienteId       String
+  cliente         Cliente @relation(fields: [clienteId], references: [id])
+
+  status          OrcamentoStatus @default(RASCUNHO)
+
+  valorTotal      Decimal @default(0) @db.Decimal(12,2)
+
+  observacoes     String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  itens           OrcamentoItem[]
+
+  @@map("orcamentos")
+}
+
+model OrcamentoItem {
+  id                String @id @default(uuid())
+
+  orcamentoId       String
+
+  orcamento         Orcamento @relation(fields: [orcamentoId], references: [id], onDelete: Cascade)
 
   produtoId         String
 
-  produto           Produto
-      @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  produto           Produto @relation(fields: [produtoId], references: [id])
 
-  quantidadeMin     Int
-
-  quantidadeMax     Int
+  quantidade        Int
 
   precoUnitario     Decimal @db.Decimal(10,2)
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  valorTotal        Decimal @db.Decimal(12,2)
 
-  @@map("tabela_precos")
+  createdAt         DateTime @default(now())
+
+  @@map("orcamento_itens")
 }
